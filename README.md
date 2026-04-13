@@ -1,6 +1,6 @@
 # Network_Routing_Optimization
 
-Team Members: Miller Kites, [Franklin Sintic](https://github.com/fjsintic)
+Team Members: [Miller Kites](https://github.com/MillerKites)_, [Franklin Sintic](https://github.com/fjsintic)
 
 Problem Description: The Network routing optimization problem is determining the most efficient path for
 data through a network while minimizing cost and delay. This problem can be modeled as a
