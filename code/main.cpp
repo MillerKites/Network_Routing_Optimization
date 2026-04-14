@@ -3,6 +3,8 @@
 
 // Included Algorithms . . .
 #include "dijkstra.cpp"
+#include "Astar.cpp"
+#include "bellman_ford.cpp"
 
 int main() {
     // Set graph parameters
