@@ -6,9 +6,21 @@
 
 int main() {
     // Set graph parameters
-    int V = 1000;
-    int E = 5000;
-
+    
+    // Small
+    /int V = 1000;
+    /int E = 5000;
+    
+    // Medium
+    /*
+    int V = 5000;
+    int E = 25000;
+    
+    // Large
+    int V = 10000;
+    int E = 50000;
+    */
+    
     // Makes the graph with V & E parameters
     auto graph = generateGraph(V,E);
     // printGraph(graph);
