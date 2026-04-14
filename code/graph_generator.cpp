@@ -34,7 +34,7 @@ vector<vector<pair<int, int>>> generateGraph(int V, int E) {
         // avoid self-loops
         if (u == v || edgeExists(graph, u, v)) continue;
 
-        int weight = rand() % 10 + 1; // weights from 1 to 10
+        int weight = rand() % 30 + 1; // weights from 1 to 10
 
         graph[u].push_back({v, weight});
         graph[v].push_back({u, weight}); // remove this if directed graph
