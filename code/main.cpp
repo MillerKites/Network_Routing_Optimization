@@ -11,7 +11,7 @@ int main() {
 
     // Makes the graph with V & E parameters
     auto graph = generateGraph(V,E);
-    printGraph(graph);
+    // printGraph(graph);
     cout << endl << endl;
 
 
