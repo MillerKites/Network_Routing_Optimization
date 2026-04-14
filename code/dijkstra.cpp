@@ -5,6 +5,12 @@
 
 using namespace std;
 
+/*
+- n = V
+- source = Node 0
+- graph
+*/
+
 // Infinity constant to initialize distances
 const int INF = numeric_limits<int>::max();
 
@@ -14,14 +20,16 @@ struct Edge {
     int weight;
 };
 
-void dijkstra(int n, int source, const vector<vector<Edge>>& adj) {
-    // 1. Initialize distances to infinity and source to 0
+void dijkstra(int n, int source, const vector<vector<pair<int,int>>>& adj) {
     vector<int> dist(n, INF);
     dist[source] = 0;
 
-    // 2. Min-priority queue: stores {distance, vertex}
-    // Greater comparison makes it a min-heap
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    priority_queue<
+        pair<int, int>, 
+        vector<pair<int, int>>, 
+        greater<pair<int, int>>
+    > pq;
+    
     pq.push({0, source});
 
     while (!pq.empty()) {
@@ -29,15 +37,15 @@ void dijkstra(int n, int source, const vector<vector<Edge>>& adj) {
         int u = pq.top().second;
         pq.pop();
 
-        // Skip if we already found a shorter path to u
+        // skip outdated entries
         if (d > dist[u]) continue;
 
-        // 3. Relax neighbors
+        // relax edges
         for (auto& edge : adj[u]) {
-            int v = edge.to;
-            int weight = edge.weight;
+            int v = edge.first;
+            int weight = edge.second;
 
-            if (dist[u] + weight < dist[v]) {
+            if (dist[u] != INF && dist[u] + weight < dist[v]) {
                 dist[v] = dist[u] + weight;
                 pq.push({dist[v], v});
             }
@@ -45,9 +53,17 @@ void dijkstra(int n, int source, const vector<vector<Edge>>& adj) {
     }
 
     // Print shortest distances
-    for (int i = 0; i < n; i++) {
-        cout << "Distance from " << source << " to " << i << ": ";
-        if (dist[i] == INF) cout << "INF" << endl;
-        else cout << dist[i] << endl;
+    int minDist = INF;
+
+for (int i = 0; i < n; i++) {
+    if (i != source) {
+        minDist = min(minDist, dist[i]);
     }
+}
+
+if (minDist == INF) {
+    cout << "No reachable nodes\n";
+} else {
+    cout << "Smallest distance from Node " << source << " = " << minDist << "\n";
+}
 }
