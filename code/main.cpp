@@ -1,10 +1,13 @@
 #include "graph_generator.cpp"
 #include <chrono>
 
+// Included Algorithms . . .
+#include "dijkstra.cpp"
+
 int main() {
     // Set graph parameters
-    int V = 2;
-    int E = 10;
+    int V = 1000;
+    int E = 5000;
 
     // Makes the graph with V & E parameters
     auto graph = generateGraph(V,E);
@@ -12,24 +15,15 @@ int main() {
     cout << endl << endl;
 
 
-    // Algorithm 1
-    auto start = std::chrono::high_resolution_clock::now();
+    // Dijkstra Algorithm
+    auto start1 = std::chrono::high_resolution_clock::now();
+    
+    dijkstra(V, 0, graph);
+    cout << endl;
 
-    // * code *
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration1 = end-start;
-    cout << "Algorithm 1 Elapsed Time: " << duration1.count() << " seconds" << endl;
-
-
-    // Algorithm 2
-    auto start = std::chrono::high_resolution_clock::now();
-
-    // * code *
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration1 = end-start;
-    cout << "Algorithm 2 Elapsed Time: " << duration1.count() << " seconds" << endl;
+    auto end1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration1 = end1-start1;
+    cout << "Dijkstra Elapsed Time: " << duration1.count() * 1000 << "ms" << endl;
 
     // Algorithm #...
     // Algorithm #...
