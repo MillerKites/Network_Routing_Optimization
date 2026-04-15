@@ -10,8 +10,8 @@ int main() {
     // Set graph parameters
     
     // Small
-    /int V = 1000;
-    /int E = 5000;
+    int V = 1000;
+    int E = 5000;
     
     // Medium
     /*
