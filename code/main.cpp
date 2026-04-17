@@ -1,57 +1,87 @@
-// C++ program for implementing the Bellman-Ford algorithm
+#include "graph_generator.cpp"
+#include <chrono>
 
-#include <iostream>
-#include <limits.h>
-#include <vector>
+// Included Algorithms . . .
+#include "dijkstra.cpp"
+#include "Astar.cpp"
+#include "bellman_ford.cpp"
 
-using namespace std;
-
-namespace bellmanford {
-    // Structure to represent an edge in the graph
-    struct Edge {
-        int source, destination, weight;
+int main() {
+    // Set graph parameters
+    
+    // Small
+    //int V = 1000;
+    //int E = 5000;
+    
+    // Medium
+    
+    //int V = 5000;
+    //int E = 25000;
+    
+    
+    // Large
+    int V = 10000;
+    int E = 50000;
+    
+    
+    // Makes the graph with V & E parameters
+    auto graph = generateGraph(V,E);
+    // printGraph(graph);
+    cout << endl << endl;
+    
+    auto heuristic = [](astar::NodeID a, astar::NodeID b) -> astar::Cost {
+    return 0;
     };
 
-    // Function to run the Bellman-Ford algorithm
-    void bellmanFord(vector<Edge>& graph, int vertices,
-                    int source)
-    {
-        // Initialize distances from source to all vertices as
-        // INFINITE
-        vector<int> distance(vertices, INT_MAX);
-        distance[source] = 0; // Distance to source itself is 0
-
-        // Relax all edges |V| - 1 times (where |V| is the
-        // number of vertices)
-        for (int i = 0; i < vertices - 1; ++i) {
-            // Iterate through all edges
-            for (const Edge& e : graph) {
-                // Update distances if a shorter path is found
-                if (distance[e.source] != INT_MAX
-                    && distance[e.source] + e.weight
-                        < distance[e.destination]) {
-                    distance[e.destination]
-                        = distance[e.source] + e.weight;
-                }
+   astar::AdjacencyList adjList;
+    for (int u = 0; u < V; u++) {
+        for (auto& edge : graph[u]) {
+                adjList[u][edge.first] = (astar::Cost)edge.second;
             }
         }
 
-        // Check for negative-weight cycles by iterating through
-        // all edges again
-        for (const Edge& e : graph) {
-            if (distance[e.source] != INT_MAX
-                && distance[e.source] + e.weight
-                    < distance[e.destination]) {
-                cout
-                    << "Graph contains negative weight cycle\n";
-                return;
-            }
-        }
+    // Dijkstra Algorithm
+    auto start1 = std::chrono::high_resolution_clock::now();
+    
+    dijkstra(V, 0, graph);
+    cout << endl;
 
-        // Print shortest distances from source to all vertices
-        /*cout << "Vertex   Distance from Source\n";
-        for (int i = 0; i < vertices; ++i) {
-            cout << i << "\t\t" << distance[i] << "\n";
-        }*/
+    auto end1 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration1 = end1-start1;
+    cout << "Dijkstra Elapsed Time: " << duration1.count() * 1000 << "ms" << endl;
+
+    // A* search Algorithm
+    auto start2 = std::chrono::high_resolution_clock::now();
+
+    astar::Path result = astar::a_star(adjList, 0, V - 1, heuristic);
+    cout << endl;
+
+    auto end2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration2 = end2 - start2;
+    cout << "A* Elapsed Time: " << duration2.count() * 1000 << "ms" << endl;
+    
+
+    cout << endl;
+
+    // Bellman-Ford Algorithm
+    vector<bellmanford::Edge> bfEdges;
+    for (int u = 0; u < V; u++) {
+        for (auto& edge : graph[u]) {
+            bfEdges.push_back({u, edge.first, edge.second});
+        }
     }
+    auto start3 = std::chrono::high_resolution_clock::now();
+
+     bellmanford::bellmanFord(bfEdges, V, 0);
+
+    auto end3 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration3 = end3 - start3;
+    cout << "Bellman-Ford Elapsed Time: " << duration3.count() * 1000 << "ms" << endl;
+
+    cout << endl;
+
+    // Algorithm #...
+    
+    
+    return 0;
 }
