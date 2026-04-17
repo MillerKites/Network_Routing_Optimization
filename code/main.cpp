@@ -10,24 +10,35 @@ int main() {
     // Set graph parameters
     
     // Small
-    int V = 1000;
-    int E = 5000;
+    //int V = 1000;
+    //int E = 5000;
     
     // Medium
-    /*
-    int V = 5000;
-    int E = 25000;
+    
+    //int V = 5000;
+    //int E = 25000;
+    
     
     // Large
     int V = 10000;
     int E = 50000;
-    */
+    
     
     // Makes the graph with V & E parameters
     auto graph = generateGraph(V,E);
     // printGraph(graph);
     cout << endl << endl;
+    
+    auto heuristic = [](astar::NodeID a, astar::NodeID b) -> astar::Cost {
+    return 0;
+    };
 
+   astar::AdjacencyList adjList;
+    for (int u = 0; u < V; u++) {
+        for (auto& edge : graph[u]) {
+                adjList[u][edge.first] = (astar::Cost)edge.second;
+            }
+        }
 
     // Dijkstra Algorithm
     auto start1 = std::chrono::high_resolution_clock::now();
@@ -39,7 +50,19 @@ int main() {
     std::chrono::duration<double> duration1 = end1-start1;
     cout << "Dijkstra Elapsed Time: " << duration1.count() * 1000 << "ms" << endl;
 
-    // Algorithm #...
+    // A* search Algorithm
+    auto start2 = std::chrono::high_resolution_clock::now();
+
+    astar::Path result = astar::a_star(adjList, 0, V - 1, heuristic);
+    cout << endl;
+
+    auto end2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration2 = end2 - start2;
+    cout << "A* Elapsed Time: " << duration2.count() * 1000 << "ms" << endl;
+    
+
+    cout << endl;
+
     // Algorithm #...
     // Algorithm #...
     
