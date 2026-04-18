@@ -26,4 +26,4 @@ are communication links that have associated weights such as distance, latency, 
 - Run main.py
 
 ## GenAI Usage Disclosure:
-Used GenAI for planning, debugging, and assisting in code translation from psuedocode to C++ (or python).
+Used GenAI for planning, debugging, and assisting in code generation and translation from psuedocode to C++.
