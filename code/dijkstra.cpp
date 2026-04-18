@@ -20,7 +20,7 @@ struct Edge {
     int weight;
 };
 
-void dijkstra(int n, int source, const vector<vector<pair<int,int>>>& adj) {
+int dijkstra(int n, int source, int target, const vector<vector<pair<int,int>>>& adj) {
     vector<int> dist(n, INF);
     dist[source] = 0;
 
@@ -40,6 +40,9 @@ void dijkstra(int n, int source, const vector<vector<pair<int,int>>>& adj) {
         // skip outdated entries
         if (d > dist[u]) continue;
 
+        // stop loop if we find the target
+        if (u == target) break;
+
         // relax edges
         for (auto& edge : adj[u]) {
             int v = edge.first;
@@ -52,18 +55,13 @@ void dijkstra(int n, int source, const vector<vector<pair<int,int>>>& adj) {
         }
     }
 
-    // Print shortest distances
-    int minDist = INF;
-
-for (int i = 0; i < n; i++) {
-    if (i != source) {
-        minDist = min(minDist, dist[i]);
+    if (dist[target] == INF) {
+        cout << "No path from Node " << source << " to Node " << target << "\n";
+    } else {
+        cout << "Shortest distance from Node " << source 
+            << " to Node " << target 
+            << " = " << dist[target] << "\n";
     }
-}
 
-if (minDist == INF) {
-    cout << "No reachable nodes\n";
-} else {
-    cout << "Smallest distance from Node " << source << " = " << minDist << "\n";
-}
+    return dist[target];
 }
