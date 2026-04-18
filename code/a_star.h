@@ -10,11 +10,15 @@ namespace astar {
     typedef float Cost;
     typedef std::pair<const NodeID, Cost> Edge;
     typedef std::unordered_map<NodeID, std::unordered_map<NodeID, Cost>> AdjacencyList;
-    typedef std::vector<NodeID> Path;
+    struct Result {
+    std::vector<NodeID> path;
+    Cost cost;
+    };
+
     typedef const std::function<Cost(NodeID, NodeID)> HeuristicFn;
 
-    Path a_star(AdjacencyList& adjacency,
-                NodeID start,
-                NodeID target,
-                HeuristicFn& heuristic);
+    Result a_star(AdjacencyList& adjacency,
+              NodeID start,
+              NodeID target,
+              HeuristicFn& heuristic);
 }
