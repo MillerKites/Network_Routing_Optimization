@@ -1,73 +1,95 @@
-// Source - https://codereview.stackexchange.com/q/285421
-// Posted by Green 绿色, modified by community. See post 'Timeline' for change history
-// Retrieved 2026-04-16, License - CC BY-SA 4.0
-
 #include "a_star.h"
 
 #include <memory>
-#include <numeric>
 #include <queue>
-#include <ranges>
 #include <set>
 #include <algorithm>
 
 namespace astar {
 
     struct PathNode {
-        NodeID node; // node
-        Cost total_cost; // cost of reaching node from starting node
-        Cost estimated_cost; // lower bound on the cost for any path from starting to target node through this node
-        std::shared_ptr<PathNode> previous; // previous record
+        NodeID node;
+        Cost total_cost;
+        Cost estimated_cost;
+        std::shared_ptr<PathNode> previous;
     };
 
     bool operator>(const PathNode& left, const PathNode& right) {
         return left.estimated_cost > right.estimated_cost;
     }
 
-    Path backtrace(PathNode& last_record) {
-        PathNode current = last_record;
-        Path path {current.node};
-        while (current.previous != nullptr) {
+    Result backtrace(PathNode current) {
+        std::vector<NodeID> path;
+        Cost cost = current.total_cost;
+
+        while (true) {
+            path.push_back(current.node);
+            if (current.previous == nullptr) break;
             current = *current.previous;
-            path.emplace_back(current.node);
         }
+
         std::reverse(path.begin(), path.end());
-        return path;
+        return { path, cost };
     }
 
-    Path a_star(AdjacencyList& adjacency,
-                NodeID         start,
-                NodeID         target,
-                HeuristicFn&   heuristic) {
+    Result a_star(AdjacencyList& adjacency,
+                  NodeID start,
+                  NodeID target,
+                  HeuristicFn& heuristic) {
+
         std::set<NodeID> visited;
-        std::priority_queue<PathNode, std::vector<PathNode>, std::greater<>> boundary;
 
-        boundary.push({start, 0, heuristic(start, target), nullptr});
-        visited.emplace(start);
+        std::priority_queue<
+            PathNode,
+            std::vector<PathNode>,
+            std::greater<>
+        > boundary;
 
-        auto was_not_visited_yet = [visited] (Edge& entry) {
-            return visited.find(entry.first) == visited.end();
-        };
+        boundary.push({
+            start,
+            0,
+            heuristic(start, target),
+            nullptr
+        });
 
-        for (; !boundary.empty(); boundary.pop()) {
-            auto current = boundary.top();
+        while (!boundary.empty()) {
+
+            PathNode current = boundary.top();
+            boundary.pop();
+
+            // skip already processed nodes
+            if (visited.find(current.node) != visited.end())
+                continue;
+
+            visited.insert(current.node);
+
+            // goal check
             if (current.node == target) {
                 return backtrace(current);
             }
-            visited.emplace(current.node);
 
-            auto edge_to_record = [current, heuristic, target] (Edge& edge) -> PathNode {
-                Cost total_cost = current.total_cost + edge.second;
-                Cost estimated_cost = total_cost + heuristic(current.node, target);
-                return {edge.first, total_cost, estimated_cost, std::make_shared<PathNode>(current)};
-            };
-
+            // expand neighbors
             for (auto& edge : adjacency[current.node]) {
-                if (was_not_visited_yet(edge)) {
-                    boundary.push(edge_to_record(edge));
-                }
+
+                NodeID neighbor = edge.first;
+                Cost weight = edge.second;
+
+                if (visited.find(neighbor) != visited.end())
+                    continue;
+
+                Cost new_cost = current.total_cost + weight;
+                Cost priority = new_cost + heuristic(neighbor, target);
+
+                boundary.push({
+                    neighbor,
+                    new_cost,
+                    priority,
+                    std::make_shared<PathNode>(current)
+                });
             }
         }
-        return {}; // no path to target
+
+        return { {}, 0 }; // no path found
     }
+
 }
