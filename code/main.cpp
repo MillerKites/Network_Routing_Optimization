@@ -1,5 +1,9 @@
 #include "graph_generator.cpp"
+
+// Extra Libraries
 #include <chrono>
+#include <cstdlib>
+#include <iomanip>
 
 // Included Algorithms . . .
 #include "dijkstra.cpp"
@@ -7,81 +11,118 @@
 #include "bellman_ford.cpp"
 
 int main() {
+
+    // Seed random number generator
+    std::srand(static_cast<unsigned int>(std::time(0)));
+
     // Set graph parameters
-    
-    // Small
-    //int V = 1000;
-    //int E = 5000;
-    
-    // Medium
-    
-    //int V = 5000;
-    //int E = 25000;
-    
-    
-    // Large
-    int V = 10000;
-    int E = 50000;
-    
-    
+    int V = 1000;
+    int E = 5000;
+    int source = 0;
+    int target = 666;
+
     // Makes the graph with V & E parameters
     auto graph = generateGraph(V,E);
-    // printGraph(graph);
     cout << endl << endl;
+
+
+    /*
+        Dijkstra Algorithm
+        Goal: Find shortest path to specific node
+    */
+
+    cout << "Dijkstra Algorithm Test" << "\nOutput: Time it takes to find the shortest path to Node " 
+                                     << target << " from Node " << source << "\n\n";
     
+    auto start1 = std::chrono::high_resolution_clock::now();
+    int cost1 = dijkstra(V, source, target, graph);
+    auto end1 = std::chrono::high_resolution_clock::now();
+    double ms1 = chrono::duration<double, milli>(end1-start1).count();
+
+
+    /*
+        A* Algorithm
+        Goal: Find shortest path to specific node
+    */
+
+    cout << "A* Algorithm Test" << "\nOutput: Time it takes to find the shortest path to Node " 
+                                      << target << " from Node " << source << "\n\n";
+
+    // Heuristics
     auto heuristic = [](astar::NodeID a, astar::NodeID b) -> astar::Cost {
-    return 0;
+    return abs((int)a - (int)b); // or 0
     };
 
-   astar::AdjacencyList adjList;
+    astar::AdjacencyList adjList;
     for (int u = 0; u < V; u++) {
         for (auto& edge : graph[u]) {
-                adjList[u][edge.first] = (astar::Cost)edge.second;
-            }
-        }
-
-    // Dijkstra Algorithm
-    auto start1 = std::chrono::high_resolution_clock::now();
-    
-    dijkstra(V, 0, graph);
-    cout << endl;
-
-    auto end1 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration1 = end1-start1;
-    cout << "Dijkstra Elapsed Time: " << duration1.count() * 1000 << "ms" << endl;
-
-    // A* search Algorithm
-    auto start2 = std::chrono::high_resolution_clock::now();
-
-    astar::Path result = astar::a_star(adjList, 0, V - 1, heuristic);
-    cout << endl;
-
-    auto end2 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration2 = end2 - start2;
-    cout << "A* Elapsed Time: " << duration2.count() * 1000 << "ms" << endl;
-    
-
-    cout << endl;
-
-    // Bellman-Ford Algorithm
-    vector<bellmanford::Edge> bfEdges;
-    for (int u = 0; u < V; u++) {
-        for (auto& edge : graph[u]) {
-            bfEdges.push_back({u, edge.first, edge.second});
+            adjList[u][edge.first] = static_cast<astar::Cost>(edge.second);
         }
     }
+
+    auto start2 = std::chrono::high_resolution_clock::now();
+    astar::Result result = astar::a_star(adjList, source, target, heuristic);
+    auto end2 = std::chrono::high_resolution_clock::now();
+    double ms2 = chrono::duration<double, milli>(end2-start2).count();
+
+    if (result.path.empty()) {
+        cout << "No path found\n";
+    } else {
+        cout << "Shortest distance from Node " << source << " to Node " << target 
+             << " = " << result.cost << "\n";
+
+        cout << "Path: ";
+        for (auto node : result.path) {
+            cout << node << " ";
+        }
+        cout << endl;
+    }
+
+
+    
+    /*
+        Bellman-Ford Algorithm
+        Goal: Find shortest path to specific node
+    */ 
+
+    vector<bellmanford::Edge> bfGraph;
+    for (int u = 0; u < V; u++) {
+        for (auto& edge : graph[u]) {
+            bfGraph.push_back({u, edge.first, edge.second});
+        }
+    }
+    
+    cout << "Bellman-Ford Algorithm Test" << "\nOutput: Time it takes to find the shortest path to Node " 
+                                      << target << " from Node " << source << "\n\n";
+
     auto start3 = std::chrono::high_resolution_clock::now();
-
-     bellmanford::bellmanFord(bfEdges, V, 0);
-
+    vector<int> dist = bellmanford::bellmanFord(bfGraph, V, source);
     auto end3 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration3 = end3 - start3;
-    cout << "Bellman-Ford Elapsed Time: " << duration3.count() * 1000 << "ms" << endl;
+    double ms3 = chrono::duration<double, milli>(end3-start3).count();;
 
-    cout << endl;
 
-    // Algorithm #...
-    
-    
+
+
+    /*
+        OUTPUTS
+    */
+
+    cout << "\n===================== ALGORITHM =======================\n";
+    cout << left << setw(15) << "Algorithm"
+         << setw(15) << "Time (ms)"
+         << setw(15) << "Cost" << "\n";
+
+    cout << "--------------------------------------------------------\n";
+    cout << left << setw(15) << "Dijkstra"
+         << setw(15) << ms1
+         << setw(15) << cost1 << "\n";
+    cout << left << setw(15) << "A*"
+         << setw(15) << ms2
+         << setw(15) << result.cost << "\n";
+    cout << left << setw(15) << "Bellman-Ford"
+         << setw(15) << ms3
+         << setw(15) << dist[target] << "\n\n\n";
+
+
     return 0;
 }
