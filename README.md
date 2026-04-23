@@ -23,7 +23,7 @@ are communication links that have associated weights such as distance, latency, 
   
 ## How to Run the Project:
 - Go to /code
-- Download the algorthm program files you want to test
+- Download all program files files
 - Run main.cpp
 
 ## GenAI Usage Disclosure:
