@@ -14,12 +14,12 @@ are communication links that have associated weights such as distance, latency, 
 - Dijkstra
 - Bellman-Ford
 - A*
-- (Planned) ACO
-- (Planned) GWO
+- (Cancelled) ACO
+- GWO
 
 ## Datasets:
 - Synthetic Graphs
-- (Planned) OpenStreetMap
+- (Cancelled) OpenStreetMap
   
 ## How to Run the Project:
 - Go to /code
