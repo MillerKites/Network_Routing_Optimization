@@ -18,24 +18,28 @@ namespace astar {
         return left.estimated_cost > right.estimated_cost;
     }
 
+    // Build final path
     Result backtrace(PathNode current) {
+
         std::vector<NodeID> path;
-        Cost cost = current.total_cost;
+        Cost totalCost = current.total_cost;
 
         while (true) {
+
             path.push_back(current.node);
-            if (current.previous == nullptr) break;
+
+            if (current.previous == nullptr)
+                break;
+
             current = *current.previous;
         }
 
         std::reverse(path.begin(), path.end());
-        return { path, cost };
+
+        return { path, totalCost };
     }
 
-    Result a_star(AdjacencyList& adjacency,
-                  NodeID start,
-                  NodeID target,
-                  HeuristicFn& heuristic) {
+    Result a_star(AdjacencyList& adjacency, NodeID start, NodeID target, HeuristicFn& heuristic) {
 
         std::set<NodeID> visited;
 
@@ -45,6 +49,7 @@ namespace astar {
             std::greater<>
         > boundary;
 
+        // Push start node
         boundary.push({
             start,
             0,
@@ -57,19 +62,19 @@ namespace astar {
             PathNode current = boundary.top();
             boundary.pop();
 
-            // skip already processed nodes
+            // Skip if already visited
             if (visited.find(current.node) != visited.end())
                 continue;
 
             visited.insert(current.node);
 
-            // goal check
+            // Goal reached
             if (current.node == target) {
                 return backtrace(current);
             }
 
-            // expand neighbors
-            for (auto& edge : adjacency[current.node]) {
+            // Expand neighbors
+            for (const auto& edge : adjacency[current.node]) {
 
                 NodeID neighbor = edge.first;
                 Cost weight = edge.second;
@@ -77,19 +82,14 @@ namespace astar {
                 if (visited.find(neighbor) != visited.end())
                     continue;
 
-                Cost new_cost = current.total_cost + weight;
-                Cost priority = new_cost + heuristic(neighbor, target);
+                Cost newCost = current.total_cost + weight;
+                Cost estimated = newCost + heuristic(neighbor, target);
 
-                boundary.push({
-                    neighbor,
-                    new_cost,
-                    priority,
-                    std::make_shared<PathNode>(current)
-                });
+                boundary.push({neighbor, newCost, estimated, std::make_shared<PathNode>(current)});
             }
         }
 
-        return { {}, 0 }; // no path found
+        // No path found
+        return { {}, 0 };
     }
-
 }
