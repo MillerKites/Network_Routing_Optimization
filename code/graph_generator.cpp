@@ -45,7 +45,7 @@ vector<vector<pair<int, int>>> generateGraph(int V, int E) {
 
         if (u == v || edgeExists(graph, u, v)) continue;
 
-        int weight = rand() % 30 + 1;
+        int weight = rand() % 50 + 10;
 
         graph[u].push_back({v, weight});
         graph[v].push_back({u, weight});
